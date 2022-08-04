@@ -1,23 +1,25 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import axios from "axios";
 
 
 const ChatPage = () => {
+    const [chats, setChats] = useState([])
 
     const fetchChats = async () => {
-        const data = await axios.get('api/chat')
-        console.log(data)
+        const data = await axios.get('api/chat');
+        setChats(data.data);
     }
 
     // run this hook when the component rendred for the first time
     useEffect(()=>{
         fetchChats();
-        console.log('here')
     }, [])
 
 
     return (
-        <div> Chat</div>
+        <div>
+            {chats.text}
+        </div>
     )
 }
 
