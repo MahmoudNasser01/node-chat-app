@@ -25,3 +25,10 @@ Run:
 
 Note:
 `project will listen to the following url (127.0.0.1:3000)`
+
+# future work
+
+## backend
+
+- morgan login
+- api end points documentation
