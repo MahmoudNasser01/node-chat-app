@@ -22,3 +22,4 @@ const auth = async (req, res, next) => {
     res.send({ error: 'invalid token JWT must be provided' })
   }
 }
+module.exports = { auth }
