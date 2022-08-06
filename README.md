@@ -4,7 +4,13 @@ create `.env`:
 
 ```sh
 PORT = 8000 # optional default to 5000
-TOKEN_SECRET="super secret"
+
+TOKEN_SECRET="super secret" # jwt secret
+
+BCRYPT_PASSWORD="your secret string" # hashing password
+SALT_ROUNDS=10 # hashing password
+
+MONGO_DB_URL="your mongoDB url" 
 ```
 
 Run:
