@@ -10,7 +10,7 @@ const ChatPage = () => {
         setChats(data.data);
     }
 
-    // run this hook when the component rendred for the first time
+    // run this hook when the component rendered for the first time
     useEffect(()=>{
         fetchChats();
     }, [])
