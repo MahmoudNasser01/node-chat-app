@@ -24,7 +24,7 @@ const Footer = ({ inputMessage, setInputMessage, handleSendMessage }) => {
             <Button
                 bg="black"
                 color="white"
-                borderRadius="none"
+                borderRadius="lg"
                 minH="100%"
                 p="7"
                 _hover={{

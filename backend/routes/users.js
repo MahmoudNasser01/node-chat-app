@@ -26,24 +26,24 @@ Route.post('/login', async (req, res, next) => {
       return next(err)
     }
 
-    const user = await User.findOne({ email: req.body.email })
+    const user = (await User.findOne({ email: req.body.email })).toObject()
 
     if (user === null) {
-      const err = new Error(`incorrect username or password`)
-      err.status = 400
-      return next(err)
+        const err = new Error(`incorrect username or password`)
+        err.status = 400
+        return next(err)
     }
 
     if (!compareHash(req.body.password, user.password)) {
-      const err = new Error(`incorrect username or password`)
-      err.status = 400
-      return next(err)
+        const err = new Error(`incorrect username or password`)
+        err.status = 400
+        return next(err)
     }
 
     const token = jwt.sign({ ...user, password: '' }, process.env.TOKEN_SECRET)
     res.cookie('jwt', token, { maxAge: 1000 * 60 * 60 * 24 })
     res.status(200)
-    res.send({ text: 'auth user', token: token })
+    res.send({ user: { ...user, password: null ,token} })
   } catch (err) {
     next(err)
   }

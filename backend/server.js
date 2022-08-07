@@ -17,7 +17,11 @@ const server = http.createServer(app)
 const { Server } = require('socket.io')
 const handelSocketIO = require('./routes/socketio')
 const { getToken } = require('./helpers/token')
-const io = new Server(server)
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:3000',
+    },
+})
 
 const port = process.env.PORT || 5000
 /**
