@@ -19,7 +19,9 @@ Run:
 - `npm start`
 
 Note:
-`project will listen to the following url (127.0.0.1:5000)`
+`project will listen to the following url (127.0.0.1:8000)`
+
+to test chat 1:1 open the url at [` / `](http://localhost:8000/)
 
 # Test FontEnd Locally
 
@@ -36,5 +38,4 @@ Note:
 
 ## backend
 
-- morgan login
 - api end points documentation

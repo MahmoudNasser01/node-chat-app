@@ -1,86 +1,120 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      body {
-        margin: 0;
-        padding-bottom: 3rem;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif;
-      }
+    <head>
+        <title>Socket.IO chat</title>
+        <style>
+            body {
+                margin: 0;
+                padding-bottom: 3rem;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                    Roboto, Helvetica, Arial, sans-serif;
+            }
 
-      #form {
-        background: rgba(0, 0, 0, 0.15);
-        padding: 0.25rem;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        height: 3rem;
-        box-sizing: border-box;
-        backdrop-filter: blur(10px);
-      }
-      #input {
-        border: none;
-        padding: 0 1rem;
-        flex-grow: 1;
-        border-radius: 2rem;
-        margin: 0.25rem;
-      }
-      #input:focus {
-        outline: none;
-      }
-      #form > button {
-        background: #333;
-        border: none;
-        padding: 0 1rem;
-        margin: 0.25rem;
-        border-radius: 3px;
-        outline: none;
-        color: #fff;
-      }
+            #form {
+                background: rgba(0, 0, 0, 0.15);
+                padding: 0.25rem;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                display: flex;
+                height: 3rem;
+                box-sizing: border-box;
+                backdrop-filter: blur(10px);
+            }
+            #input {
+                border: none;
+                padding: 0 1rem;
+                flex-grow: 1;
+                border-radius: 2rem;
+                margin: 0.25rem;
+            }
+            #input:focus {
+                outline: none;
+            }
+            #form > button {
+                background: #333;
+                border: none;
+                padding: 0 1rem;
+                margin: 0.25rem;
+                border-radius: 3px;
+                outline: none;
+                color: #fff;
+            }
 
-      #messages {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      #messages > li {
-        padding: 0.5rem 1rem;
-      }
-      #messages > li:nth-child(odd) {
-        background: #efefef;
-      }
-    </style>
-  </head>
-  <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
-    <script>
-      var socket = io()
+            #messages {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+            #messages > li {
+                padding: 0.5rem 1rem;
+            }
+            #messages > li:nth-child(odd) {
+                background: #efefef;
+            }
+        </style>
+    </head>
+    <body>
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" /><button>Send</button>
+        </form>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+        <script>
+          const token = getCookie('jwt')
+          const user = parseJwt(token)
+            var socket = io({
+                auth: {
+                    token,
+                },
+            })
+            socket.user = user;
+            var form = document.getElementById('form')
+            var input = document.getElementById('input')
 
-      var form = document.getElementById('form')
-      var input = document.getElementById('input')
+            form.addEventListener('submit', function (e) {
+                e.preventDefault()
+                if (input.value) {
+                    socket.emit('msg', input.value)
+                    input.value = ''
+                }
+            })
 
-      form.addEventListener('submit', function (e) {
-        e.preventDefault()
-        if (input.value) {
-          socket.emit('msg', input.value)
-          input.value = ''
-        }
-      })
-      socket.on('msg', function (msg) {
-        console.log(msg)
-        var item = document.createElement('li')
-        item.textContent = msg
-        messages.appendChild(item)
-        window.scrollTo(0, document.body.scrollHeight)
-      })
-    </script>
-  </body>
+            socket.on('msg', function (from,msg) {
+                addMsg(from.username+": "+msg)
+            })
+
+            function addMsg(msg) {
+                var item = document.createElement('li')
+                item.textContent = msg
+                messages.appendChild(item)
+                window.scrollTo(0, document.body.scrollHeight)
+            }
+
+            function getCookie(name) {
+                const value = `; ${document.cookie}`
+                const parts = value.split(`; ${name}=`)
+                if (parts.length === 2) return parts.pop().split(';').shift()
+            }
+            function parseJwt(token) {
+                var base64Url = token.split('.')[1]
+                var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+                var jsonPayload = decodeURIComponent(
+                    window
+                        .atob(base64)
+                        .split('')
+                        .map(function (c) {
+                            return (
+                                '%' +
+                                ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                            )
+                        })
+                        .join('')
+                )
+
+                return JSON.parse(jsonPayload)
+            }
+        </script>
+    </body>
 </html>
