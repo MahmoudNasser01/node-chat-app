@@ -1,3 +1,5 @@
+const { io } = require('../server')
+
 const Router = require('express').Router()
 
 Router.get('/chat', (req, res) => {
