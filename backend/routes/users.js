@@ -87,6 +87,16 @@ Route.post('/login', async (req, res, next) => {
         res.status(200)
         res.send({ users: users.map((user) => user.toObject()) })
     })
-
+    .get('/search', async (req, res) => {
+        const keyword = req.query.q ? {
+            $or:[
+                { name: { $regex: req.query.q, $options: 'i' } },
+                { email: { $regex: req.query.q, $options: 'i' } },
+            ]
+        } : {};
+        // TODO: exclude current user from search result
+        const users = await User.find(keyword);
+        res.status(200).send({ users: users.map((user) => user.toObject()) })
+    })
 
 module.exports = Route

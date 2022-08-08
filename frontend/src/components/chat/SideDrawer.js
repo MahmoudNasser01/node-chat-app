@@ -1,6 +1,6 @@
-import { Button } from '@chakra-ui/button'
-import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons'
-import { Input } from '@chakra-ui/input'
+import {Button} from '@chakra-ui/button'
+import {BellIcon, ChevronDownIcon} from '@chakra-ui/icons'
+import {Input} from '@chakra-ui/input'
 import {
     Avatar,
     Box,
@@ -14,29 +14,35 @@ import {
     MenuButton,
     MenuDivider,
     MenuItem,
-    MenuList,
+    MenuList, Spinner,
     Text,
     Tooltip,
     useDisclosure,
     useToast,
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import Profile from '../user/Profile'
-import { ChatState } from '../../Context/ChatProvider'
+import {ChatState} from '../../Context/ChatProvider'
+import ChatLoading from "./ChatLoading";
+import axios from "axios";
+import UserListItem from "./UserListItem";
+import login from "../auth/Login";
+
+
 const SideDrawer = () => {
     const [search, setSearch] = useState('')
     const [searchResult, setSearchResult] = useState([])
     const [loading, setLoading] = useState(false)
     const [loadingChat, setLoadingChat] = useState(false)
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const {isOpen, onOpen, onClose} = useDisclosure()
     const defaultUser = {
         name: 'John Doe',
         picture:
             'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60',
     }
-    const { user } = ChatState()
+    const {user} = ChatState()
     const toast = useToast()
-    const handleSearch = () => {
+    const handleSearch = async () => {
         if (!search) {
             toast({
                 title: 'Search field is empty',
@@ -47,9 +53,41 @@ const SideDrawer = () => {
                 position: 'top-left',
             })
         }
+
+        // make the api call
+        try {
+            setLoading(true);
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            }
+            const {data} = await axios.get(`http://localhost:8000/user/search/?q=${search}`, config);
+            setLoading(false);
+            setSearchResult(data.users);
+
+        } catch (error) {
+            console.log(error)
+            toast({
+                title: 'Error Occurred',
+                description: 'Failed to search for user',
+                status: 'error',
+                duration: 1000,
+                isClosable: true,
+                position: 'bottom-left',
+            })
+        }
+
+
+
     }
     const handelLogout = () => {
         //TODO handel logout user
+    }
+
+    // Todo: create chat
+    const createChat = () => {
     }
 
     return (
@@ -70,7 +108,7 @@ const SideDrawer = () => {
                 >
                     <Button variant="ghost" onClick={onOpen}>
                         <i className="fa fa-search"></i>
-                        <Text display={{ base: 'none', md: 'flex' }} px="4">
+                        <Text display={{base: 'none', md: 'flex'}} px="4">
                             Search for a chat
                         </Text>
                     </Button>
@@ -81,14 +119,14 @@ const SideDrawer = () => {
                 <div>
                     <Menu>
                         <MenuButton p={1}>
-                            <BellIcon fontSize={'2xl'} m={1} />
+                            <BellIcon fontSize={'2xl'} m={1}/>
                         </MenuButton>
                         {/*<MenuList></MenuList>*/}
                     </Menu>
                     <Menu>
                         {user?.name || defaultUser.name}
                         <MenuButton p={1}>
-                            <ChevronDownIcon fontSize={'2xl'} m={1} />
+                            <ChevronDownIcon fontSize={'2xl'} m={1}/>
                             <Avatar
                                 size={'sm'}
                                 cursor={'pointer'}
@@ -100,7 +138,7 @@ const SideDrawer = () => {
                             <Profile>
                                 <MenuItem>My Profile</MenuItem>
                             </Profile>
-                            <MenuDivider />
+                            <MenuDivider/>
                             <MenuItem onClick={handelLogout}>Logout</MenuItem>
                         </MenuList>
                     </Menu>
@@ -108,10 +146,10 @@ const SideDrawer = () => {
             </Box>
 
             <Drawer placement={'left'} isOpen={isOpen} onClose={onClose}>
-                <DrawerOverlay />
+                <DrawerOverlay/>
                 <DrawerContent>
                     <DrawerHeader>Search users</DrawerHeader>
-                    <DrawerCloseButton />
+                    <DrawerCloseButton/>
                     <DrawerBody>
                         <Box display="flex" pb={2}>
                             <Input
@@ -122,6 +160,19 @@ const SideDrawer = () => {
                             />
                             <Button onClick={handleSearch}>Go</Button>
                         </Box>
+
+                        {loading ? (
+                            <ChatLoading/>
+                        ) : (
+                            searchResult?.map((user) => (
+                                <UserListItem
+                                    key={user._id}
+                                    user={user}
+                                    handleFunction={() => createChat()}
+                                />
+                            ))
+                        )}
+                        {loadingChat && <Spinner ml="auto" d="flex"/>}
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>
