@@ -25,7 +25,9 @@ const handelSocketIO = (io) => {
         socket.on('msg', ({ to: toUser, msg }) => {
             console.log(msg + ' to ' + toUser.name)
 
-            io.emit('msg', { from: socket.user, msg })
+            io.to(toUser.email)
+                .to(socket.id)
+                .emit('msg', { from: socket.user, msg })
         })
         socket.on('getOnlineUsers', () => {
             console.log(socket.user.name + ' request online users')
