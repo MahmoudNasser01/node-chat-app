@@ -15,7 +15,13 @@ dotenv.config()
 const http = require('http')
 const server = http.createServer(app)
 const { Server } = require('socket.io')
-const io = new Server(server)
+const handelSocketIO = require('./routes/socketio')
+const { getToken } = require('./helpers/token')
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:3000',
+    },
+})
 
 const port = process.env.PORT || 5000
 /**
@@ -26,17 +32,30 @@ const port = process.env.PORT || 5000
 app.use(express.json())
 // cors for cros origin policy
 app.use(
-  cors({
-    origin: 'http://localhost:3000',
-  })
+    cors({
+        origin: 'http://localhost:3000',
+    })
 )
 // morgan for debugging requests
 app.use(morgan('dev'))
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html')
-})
+if (app.get('env') === 'development') {
+    const users = [
+        { username: 'test', email: 'test@email.com' },
+        { username: 'user2', email: 'user2@email.com' },
+        { username: 'user', email: 'user@email.com' },
+    ]
+    app.get('/', (req, res) => {
+        if (users.length <= 0) {
+            res.status(404)
+            res.send('no more users')
+        }
+        const user = users.pop()
+        res.cookie('jwt', getToken({ ...user }))
 
+        res.sendFile(__dirname + '/public/index.html')
+    })
+}
 /**
  * express routes
  */
@@ -49,31 +68,22 @@ app.use('/api', ApiRoute)
  */
 //  catch 404 and forward to error handler
 app.use((req, res, next) => {
-  next({ status: 404, message: 'page not found' })
+    next({ status: 404, message: 'page not found' })
 })
 
 //  error handler
 app.use((err, req, res, next) => {
-  //  render the error page
-  res.status(err.status || 500)
-  res.send({ error: err.message })
+    //  render the error page
+    res.status(err.status || 500)
+    res.send({ error: err.message })
 })
 
 server.listen(port, () => {
-  mongoose.connect(process.env.MONGO_DB_URL).then((v) => {
-    console.log('connected to DB')
-  })
-  configSwagger(app, port)
-  io.on('connection', (socket) => {
-    console.log('connected with ' + socket.id)
-    socket.on('msg', (msg) => {
-      console.log(socket.id + ' send ' + msg)
-      io.emit('msg', msg)
+    mongoose.connect(process.env.MONGO_DB_URL).then((v) => {
+        console.log('connected to DB')
     })
-    socket.on('disconnect', (reason) => {
-      console.log('user ' + socket.id + ' disconnected reason ' + reason)
-    })
-  })
+    configSwagger(app, port)
+    handelSocketIO(io)
 })
 
 module.exports = { io }

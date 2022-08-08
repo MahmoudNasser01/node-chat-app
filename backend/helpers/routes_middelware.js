@@ -12,9 +12,9 @@ const auth = async (req, res, next) => {
     }
     const token = req.headers.authorization?.split(' ')[1]
     if (!token) throw Error('token required')
-    jwt.verify(token, process.env.TOKEN_SECRET)
+    const user = jwt.verify(token, process.env.TOKEN_SECRET)
 
-    req.token = token;
+    req.user = user
     next()
   } catch (error) {
     res.status(403)
