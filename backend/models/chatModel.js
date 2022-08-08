@@ -1,42 +1,47 @@
 const mongoose = require('mongoose')
 
-const chatModel = mongoose.Schema({
-
+const chatModel = mongoose.Schema(
+    {
         name: {
             type: String,
-            trim: true
+            trim: true,
         },
         description: {
             type: String,
-            trim: true
+            trim: true,
         },
         type: {
             type: String,
-            enum: ['direct', 'group']
+            enum: ['direct', 'group'],
         },
         participants: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-                role: String
-            }
+                ref: 'User',
+                role: String,
+            },
         ],
+        picture: {
+            type: String,
+            required: true,
+            default:
+                'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg',
+        },
         latestMessage: {
             type: String,
-            ref: "Message"
+            ref: 'Message',
         },
         messages: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "Message"
-
-            }
-        ]
-
+                ref: 'Message',
+            },
+        ],
     },
     {
-        timestamps: true
-    });
+        timestamps: true,
+    }
+)
 
 
 const Chat = mongoose.model('Chat', chatModel)

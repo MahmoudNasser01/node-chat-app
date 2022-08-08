@@ -10,6 +10,13 @@ const MyChats = ({ chats, setCurrentChat }) => {
     }
 
     const setSelectedChat = (chat) => {
+        // TODO create group chat
+        /**
+         * name : target user
+         * pic: target user pic
+         * type: direct
+         *
+         */
         setCurrentChat(chat)
     }
 

@@ -12,21 +12,22 @@ import Messages from './messages'
 const Chat = ({ currentChat }) => {
     const { socket } = ChatState()
     const [messages, setMessages] = useState([
-        { from: 'computer', text: 'Hi, My Name is HoneyChat' },
+        { from: 'other', text: 'Hi, My Name is HoneyChat' },
         { from: 'me', text: 'Hey there' },
         { from: 'me', text: 'Myself Ferin Patel' },
         {
-            from: 'computer',
+            from: 'other',
             text: "Nice to meet you. You can send me message and i'll reply you with same message.",
         },
     ])
     const [inputMessage, setInputMessage] = useState('')
+    let sub = false
     useEffect(() => {
-        if (socket !== null) {
+        if (socket !== null && sub === false) {
+            sub = true
             socket.on('msg', ({ msg, from }) => {
                 console.log(msg + ' from ' + from.name)
-                const fromWho =
-                    from?.email === socket?.user?.email ? 'me' : 'computer'
+                const fromWho = from?._id === socket?.user?._id ? 'me' : 'other'
                 setMessages((old) => [...old, { from: fromWho, text: msg }])
                 setInputMessage('')
             })
@@ -38,7 +39,8 @@ const Chat = ({ currentChat }) => {
         }
         const msg = inputMessage
         if (!!currentChat) {
-            socket.emit('msg', { to: currentChat, msg })
+            console.log({ ...currentChat, sendMsg: msg })
+            socket.emit('msg', { to: currentChat._id, msg })
         }
     }
 

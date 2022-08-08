@@ -10,11 +10,12 @@ const handelSocketIO = (io) => {
     io.use((socket, next) => {
         const user = decodeToken(socket.handshake.auth.token)
         socket.user = user
-        if (onlineUsers?.[user.email]) {
+        if (onlineUsers?.[user._id]) {
             socket.disconnect(true)
         } else {
-            socket.join(user.email)
-            onlineUsers[user.email] = socket
+            socket.join(user._id)
+            socket.join('62f0fe63ab4c8d313de2a6c6') //62f0fe63ab4c8d313de2a6c6
+            onlineUsers[user._id] = socket
         }
 
         next()
@@ -22,19 +23,18 @@ const handelSocketIO = (io) => {
     io.on('connection', (socket) => {
         console.log('users connected ' + socket.user.name)
         // socket.emit('newUser', socket.user)
-        socket.on('msg', ({ to: toUser, msg }) => {
-            console.log(msg + ' to ' + toUser.name)
+        // make it id
+        socket.on('msg', ({ to: Id, msg }) => {
+            console.log(msg + ' to ' + onlineUsers[Id]?.user?.name || Id)
 
-            io.to(toUser.email)
-                .to(socket.id)
-                .emit('msg', { from: socket.user, msg })
+            io.to(Id).to(socket.id).emit('msg', { from: socket.user, msg })
         })
         socket.on('getOnlineUsers', () => {
             console.log(socket.user.name + ' request online users')
 
             const online = Object.keys(onlineUsers)
-                .filter((email) => socket.user.email !== email)
-                .map((email) => onlineUsers[email].user)
+                .filter((id) => socket.user._id !== id)
+                .map((id) => onlineUsers[id].user)
 
             io.to(socket.id).emit('getOnlineUsers', online)
         })
