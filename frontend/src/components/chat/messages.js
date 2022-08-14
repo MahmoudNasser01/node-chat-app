@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react'
 import { Avatar, Flex, Text } from '@chakra-ui/react'
+import {ChatState} from "../../Context/ChatProvider";
 
 const Messages = ({ messages }) => {
+    const {user, socket, chats, setChats, selectedChat, setSelectedChat, fetchAgain, setFetchAgain} = ChatState()
     const AlwaysScrollToBottom = () => {
         const elementRef = useRef()
         useEffect(() => elementRef.current.scrollIntoView())
