@@ -7,16 +7,6 @@ require('dotenv').config()
 
 const Route = express.Router()
 
-//TODO document routes
-/**
- * @openapi
- * /user:
- *  post:
- *     description: login new user
- *     responses:
- *       200:
- *         description: API is  running
- */
 
 Route.post('/login', async (req, res, next) => {
     try {
@@ -83,7 +73,7 @@ Route.post('/login', async (req, res, next) => {
         }
     })
     .get('/all', async (req, res) => {
-        const users = await User.find({})
+        const users = await User.find({}).select("-password");
         res.status(200)
         res.send({ users: users.map((user) => user.toObject()) })
     })

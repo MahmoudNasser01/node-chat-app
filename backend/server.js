@@ -67,9 +67,9 @@ app.use('/api', ApiRoute)
  * middleware before routes to handel error from routes
  */
 //  catch 404 and forward to error handler
-app.use((req, res, next) => {
-    next({ status: 404, message: 'page not found' })
-})
+// app.use((req, res, next) => {
+//     next({ status: 404, message: 'page not found' })
+// })
 
 //  error handler
 app.use((err, req, res, next) => {
