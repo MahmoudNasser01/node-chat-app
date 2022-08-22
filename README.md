@@ -39,3 +39,25 @@ Note:
 ## backend
 
 - api end points documentation
+
+# EndPoints :)
+- signup [ x ]
+- login [ x ]
+- logout [ x ]
+- search all users [ x ]  `users/`
+- get a user by id [ ] `users/:id`
+- update a user data by id [ ] `users/:id` PUT
+- delete a user by id [ ] `users/:id` DELETE
+- get all chats [ ] `chats/` GET
+- get a chat by id [ ] `chats/:id`GET
+- search for a chat [ ] `chats/search/:id` GET
+- get a message by id [ ] `chats/:id/messages/:id` GET
+- create new group [ ] `chats/` POST
+- user can create a message [ ] `chats/:id/messages/` POST
+- user can update a message by id [ ] `chats/:id/messages/:id` PUT
+- user can delete a message by id [ ] `chats/:id/messages/:id` DELETE
+- user add users to a group [ ] `chats/:id/add/` POST
+- remove users from a group [ ] `chats/:id/remove/` POST
+- set group admin [ ] `chats/:id/admin/` POST
+- update group settings [ ] `chats/:id/settings/` PUT
+- banned chats [ ] `chats/:id/banned/` POST

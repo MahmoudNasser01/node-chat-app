@@ -1,12 +1,12 @@
-const swaggerJsdoc = require('swagger-jsdoc')
-const swaggerUi = require('swagger-ui-express')
-
+const swagger = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
+const swaggerDocsJSON = require('./docs.json')
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'node chat',
-      description: 'Example of CRUD API ',
+      description: 'Chat Application',
       version: '1.0.0',
     },
     servers: [
@@ -18,11 +18,10 @@ const options = {
   apis: ['./backend/routes/*.js'],
 }
 
-const swaggerSpec = swaggerJsdoc(options)
-
+const swaggerSpec = swagger(options)
 function swaggerDocs(app, port) {
   // Swagger Page
-  app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+  app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerDocsJSON, { explorer: true }));
 
   // Docs in JSON format
   app.get('/docs.json', (req, res) => {
