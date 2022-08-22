@@ -18,9 +18,12 @@ const chatModel = mongoose.Schema(
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User',
-                role: String,
             },
         ],
+        groupAdmin:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
         picture: {
             type: String,
             required: true,

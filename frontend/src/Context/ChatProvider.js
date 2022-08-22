@@ -1,16 +1,31 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { io } from 'socket.io-client'
+import React, {createContext, useContext, useEffect, useState} from "react";
+import {useHistory} from "react-router-dom";
+import {io} from 'socket.io-client'
 import url from '../url'
 
 const ChatContext = createContext()
 
-const ChatProvider = ({ children }) => {
-    const [selectedChat, setSelectedChat] = useState(0)
+const ChatProvider = ({children}) => {
+    const defaultChat = {
+        name: 'default',
+        picture:
+            'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg',
+        _id: '62f0fe63ab4c8d313de2a6c6',
+
+        type: 'direct',
+        messages: [],
+        participants: [],
+        createdAt: '2022-08-08T12:15:31.117Z',
+        updatedAt: '2022-08-08T12:15:31.117Z',
+        __v: 0,
+    }
+    const [selectedChat, setSelectedChat] = useState({})
     const [user, setUser] = useState(null)
     const [notification, setNotification] = useState([])
     const [chats, setChats] = useState()
     const [socket, setSocket] = useState(null)
+    const [fetchAgain, setFetchAgain] = useState(false) // this state if a flag to tell us if we need to fetch again all my chats
+
 
     const history = useHistory()
 

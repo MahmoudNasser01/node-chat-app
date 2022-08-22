@@ -26,7 +26,8 @@ import {ChatState} from '../../Context/ChatProvider'
 import ChatLoading from "./ChatLoading";
 import axios from "axios";
 import UserListItem from "./UserListItem";
-import login from "../auth/Login";
+import url from '../../url'
+
 
 
 const SideDrawer = () => {
@@ -35,12 +36,13 @@ const SideDrawer = () => {
     const [loading, setLoading] = useState(false)
     const [loadingChat, setLoadingChat] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const {selectedChat, setSelectedChat, chats, setChats, user} = ChatState()
+
     const defaultUser = {
         name: 'John Doe',
         picture:
             'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60',
     }
-    const {user} = ChatState()
     const toast = useToast()
     const handleSearch = async () => {
         if (!search) {
@@ -63,12 +65,11 @@ const SideDrawer = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             }
-            const {data} = await axios.get(`http://localhost:8000/user/search/?q=${search}`, config);
-            setLoading(false);
+            const {data} = await axios.get(`${url}/user/search/?q=${search}`, config);
             setSearchResult(data.users);
+            setLoading(false);
 
         } catch (error) {
-            console.log(error)
             toast({
                 title: 'Error Occurred',
                 description: 'Failed to search for user',
@@ -87,7 +88,35 @@ const SideDrawer = () => {
     }
 
     // Todo: create chat
-    const createChat = () => {
+    const createChat = async (userId) => {
+        try {
+            setLoadingChat(true)
+            const config = {
+                headers: {
+                    'Content-type': 'application/json',
+                    Authorization: `Bearer ${user.token}`,
+                }
+            }
+
+            const {data} = await axios.post(`${url}/api/chat`, {userId}, config);
+            // append the new chat to the list of chats
+            if(!chats.find((c) => c._id === data._id)){
+                setChats([...chats, data])
+            }
+            setSelectedChat(data)
+            setLoadingChat(false);
+            onClose();
+
+        }catch (e) {
+            toast({
+                title: 'Error Occurred',
+                description: 'Failed to create chat',
+                status: 'error',
+                duration: 1000,
+                isClosable: true,
+                position: 'bottom-left',
+            })
+        }
     }
 
     return (
@@ -168,7 +197,7 @@ const SideDrawer = () => {
                                 <UserListItem
                                     key={user._id}
                                     user={user}
-                                    handleFunction={() => createChat()}
+                                    handleFunction={() => createChat(user._id)}
                                 />
                             ))
                         )}
